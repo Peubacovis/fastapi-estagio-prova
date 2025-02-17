@@ -5,13 +5,18 @@ import models
 from database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
+
+# Dependency
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+# CRUD para Empresa
 @app.post("/empresas/", response_model=schemas.Empresa)
 def create_empresa(empresa: schemas.EmpresaCreate, db: Session = Depends(get_db)):
     db_empresa = models.Empresa(**empresa.dict())
@@ -27,6 +32,7 @@ def read_empresa(empresa_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Empresa não encontrada")
     return db_empresa
 
+# CRUD para ObrigacaoAcessoria
 @app.post("/obrigacoes/", response_model=schemas.ObrigacaoAcessoria)
 def create_obrigacao(obrigacao: schemas.ObrigacaoAcessoriaCreate, db: Session = Depends(get_db)):
     db_obrigacao = models.ObrigacaoAcessoria(**obrigacao.dict())
